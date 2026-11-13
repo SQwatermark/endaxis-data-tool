@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+.local/
+.idea/
+.ruff_cache/
+*.iml
+output/
+*.egg-info/
+build/
+dist/
+**/bin/
+**/obj/
