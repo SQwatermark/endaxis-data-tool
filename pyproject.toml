@@ -1,11 +1,13 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "endaxis-data-tool"
 version = "0.1.0"
 requires-python = ">=3.11"
 description = "Export supplementary native data consumed by the Endaxis compiler"
+license = "GPL-3.0-only"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 dependencies = ["brotli>=1.1,<2", "cryptography>=44"]
 [project.scripts]
 endaxis-data-tool = "endaxis_data_tool.cli:main"

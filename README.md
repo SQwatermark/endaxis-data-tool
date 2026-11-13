@@ -14,6 +14,8 @@ python -m pip install -e .
 
 `unity` 读取终末地定制包和 UnityFS、SerializedFile、对象引用及 TypeTree；`decoders` 将原生字段投影为编译器来源文档。工具不加载 VFS 浏览器，也不维护第二套 AKE JsonData 解码器。
 
+从游戏资源到 Endaxis 全量候选及发布的步骤见 Endaxis 仓库中的 `tools/game-data-compiler/docs/first-rebuild.md`。其 `npm run rebuild:game-data:local` 入口会调用本工具，自动管理补充导出和临时服务；AKE 的原始资源准备仍按指南先行完成。
+
 ## 导出流程
 
 先用 AKE Data Tool 准备同版本的 VFS，并导出 TableCfg、Json 与图片。以下输入路径均由调用者指定，输出路径必须尚不存在。
@@ -54,6 +56,8 @@ endaxis-data-tool serve --json-root <AKE的Json目录> --table-root <AKE的Table
 
 监听 `127.0.0.1:8766`。`--image-root` 可省略；省略时不提供图片补缺。所有根目录均为只读。
 
+使用 `--port 0` 时由系统分配可用端口。绑定成功后输出一行 `ENDAXIS_SOURCE_READY {"port":端口,"version":"来源版本"}`，供父进程确认服务地址与版本；该行不包含密钥。
+
 | 路径 | 内容 |
 | --- | --- |
 | `/api/data/TableCfg-current/<name>.json` | AKE 表格导出 |
@@ -79,3 +83,9 @@ python -m unittest discover -s tests
 ```
 
 结构和读取边界见 [架构说明](docs/architecture.md)。合成测试覆盖包提取、TypeTree、managed reference、原始整数身份、布尔字段及错误时不发布。真实资源验证需要另外检查完整包清单、原始对象摘要、导出字段和编译器消费结果。游戏资源、运行时、密钥、导出快照与诊断日志不提交到源码仓库。
+
+## 许可证
+
+Copyright (C) 2026 SQwatermark.
+
+本项目使用 GNU General Public License version 3（GPL-3.0-only），完整条款见 [LICENSE](LICENSE)。第三方组件说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

@@ -1,7 +1,12 @@
 import json
+import queue
+import subprocess
+import sys
 import tempfile
+import threading
 import unittest
 from pathlib import Path
+from urllib.request import urlopen
 
 from endaxis_data_tool.export import export
 from endaxis_data_tool.server import SourceFiles
@@ -36,6 +41,62 @@ class SourcesTest(unittest.TestCase):
             json.loads(self.files.read("SkillData/manifest.json")),
             [{"contentFile": "/api/data/SkillData/a.json"}],
         )
+
+    def test_service_reports_bound_port_and_serves_versioned_inputs(self):
+        (self.tables / "CharacterTable.json").write_text('{"fixture":true}')
+        process = subprocess.Popen(
+            [
+                sys.executable,
+                "-m",
+                "endaxis_data_tool",
+                "serve",
+                "--port",
+                "0",
+                "--json-root",
+                str(self.json),
+                "--table-root",
+                str(self.tables),
+                "--supplemental-root",
+                str(self.extra),
+                "--version",
+                "1.6.4",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+        )
+        ready = queue.Queue()
+        reader = threading.Thread(
+            target=lambda: ready.put(process.stdout.readline()), daemon=True
+        )
+        reader.start()
+        try:
+            line = ready.get(timeout=10)
+            self.assertTrue(line.startswith("ENDAXIS_SOURCE_READY "), line)
+            address = json.loads(line.removeprefix("ENDAXIS_SOURCE_READY "))
+            self.assertEqual(address["version"], "1.6.4")
+            self.assertGreater(address["port"], 0)
+            with urlopen(
+                f"http://127.0.0.1:{address['port']}/api/data/TableCfg-current/CharacterTable.json",
+                timeout=5,
+            ) as response:
+                self.assertEqual(json.load(response), {"fixture": True})
+                self.assertEqual(response.headers["X-Endaxis-Version"], "1.6.4")
+                self.assertEqual(
+                    response.headers["X-Endaxis-Provider"], "ake-data-tool"
+                )
+        finally:
+            if process.poll() is None:
+                process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+            reader.join(timeout=5)
+            process.stdout.close()
+            process.stderr.close()
 
     def test_invalid_paths_and_wrong_versions_are_rejected(self):
         for path in (

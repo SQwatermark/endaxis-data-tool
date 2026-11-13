@@ -142,4 +142,10 @@ def serve(files: SourceFiles, port: int):
             except ValueError as error:
                 self.send_error(400, str(error))
 
-    ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
+    with ThreadingHTTPServer(("127.0.0.1", port), Handler) as server:
+        print(
+            "ENDAXIS_SOURCE_READY "
+            + json.dumps({"port": server.server_port, "version": files.version}),
+            flush=True,
+        )
+        server.serve_forever()
