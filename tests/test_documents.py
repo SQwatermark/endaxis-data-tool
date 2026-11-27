@@ -24,7 +24,7 @@ class TemplateDocumentTests(unittest.TestCase):
             ),
             0,
         )
-        root.update(id="entity_test", componentList=[])
+        root.update(id="entity_Test", componentList=[])
         decoded = {
             "prefix": {
                 "id": "entity_test",
@@ -37,6 +37,7 @@ class TemplateDocumentTests(unittest.TestCase):
         }
         document = project("AbilityEntityData", "entity_test", decoded)
         self.assertEqual(document["gameId"], "entity_test")
+        self.assertEqual(document["nativeData"]["template"]["id"], "entity_Test")
         self.assertEqual(document["rootRid"], 42)
         self.assertEqual(document["nativeData"]["decodeStatus"], "complete")
         self.assertNotIn("abilityEntityTemplateData", document)

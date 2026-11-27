@@ -14,7 +14,7 @@ python -m pip install -e .
 
 `unity` 读取终末地定制包和 UnityFS、SerializedFile、对象引用及 TypeTree；`decoders` 将原生字段投影为编译器来源文档。工具不加载 VFS 浏览器，也不维护第二套 AKE JsonData 解码器。
 
-从游戏资源到 Endaxis 全量候选及发布的步骤见 Endaxis 仓库中的 `tools/game-data-compiler/docs/first-rebuild.md`。其 `npm run rebuild:game-data:local` 入口会调用本工具，自动管理补充导出和临时服务；AKE 的原始资源准备仍按指南先行完成。
+完整导出与 Endaxis 资源生成由 Endaxis 仓库的 `npm run rebuild:game-data:local` 统一执行；它自动调用 AKE 和本工具。用法见 Endaxis 的 `tools/game-data-compiler/README.md`，参数与执行范围见 `tools/game-data-compiler/scripts/rebuildFromInstalledGame.ts` 的文件注释。以下命令供单独使用补充导出和来源服务时调用。
 
 ## 导出流程
 

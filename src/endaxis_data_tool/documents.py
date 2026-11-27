@@ -19,10 +19,9 @@ def project(collection: str, identity: str, decoded: dict) -> dict:
         return decoded
     prefix = decoded["prefix"]
     root = prefix["template"]
-    if prefix["id"] != identity or root["id"] != identity:
+    if prefix["id"] != identity or root["id"].casefold() != identity.casefold():
         raise ValueError("Ability entity identity mismatch")
     mapping = {
-        "gameId": "id",
         "name": "name",
         "factionNativeValue": "faction",
         "bornTagIds": "bornTag",
@@ -38,7 +37,7 @@ def project(collection: str, identity: str, decoded: dict) -> dict:
         "enableBornFadeIn": "enableBornFadeIn",
         "fadeInSeconds": "fadeInTime",
     }
-    template = {key: root[value] for key, value in mapping.items()}
+    template = {"gameId": identity, **{key: root[value] for key, value in mapping.items()}}
     template.update(
         componentCount=len(root["componentList"]),
         managedReferenceCount=prefix["managedReferenceCount"],
